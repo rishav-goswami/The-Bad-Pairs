@@ -4,6 +4,9 @@ import 'package:badminton_team_up/providers/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+// This is the type used by the popup menu below.
+enum Menu { deleteAll, itemTwo, itemThree, itemFour }
+
 class MyHomePage extends ConsumerStatefulWidget {
   const MyHomePage({super.key, required this.title});
 
@@ -18,6 +21,8 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   late Future<List<String>?> playerList;
   late bool toggleButton;
   final playersNameController = TextEditingController();
+  String _selectedMenu = '';
+
   @override
   void initState() {
     super.initState();
@@ -66,6 +71,14 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       playerNames.removeAt(idx);
     });
     await Session.setStringList(Constants.playersListKey, playerNames);
+  }
+
+// To delete all teams of players
+  void _deleteAllPlayers() async {
+    await Session.deletePrefData(Constants.playersListKey);
+    setState(() {
+      playerNames.clear();
+    });
   }
 
   // Confirmation dialog box for deletion of player
@@ -122,7 +135,34 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
               onChanged: (val) async {
                 await Session.setBool(Constants.isDarkKey, val);
                 toggleTheme(ref);
-              })
+              }),
+          // This button presents popup menu items.
+          PopupMenuButton<Menu>(
+              // Callback that sets the selected popup menu item.
+              onSelected: (Menu item) {
+                setState(() {
+                  _selectedMenu = item.name;
+                });
+              },
+              itemBuilder: (BuildContext context) => <PopupMenuEntry<Menu>>[
+                    PopupMenuItem<Menu>(
+                      value: Menu.deleteAll,
+                      onTap: _deleteAllPlayers,
+                      child: const Text('Delete All Teams'),
+                    ),
+                    // const PopupMenuItem<Menu>(
+                    //   value: Menu.itemTwo,
+                    //   child: Text('Item 2'),
+                    // ),
+                    // const PopupMenuItem<Menu>(
+                    //   value: Menu.itemThree,
+                    //   child: Text('Item 3'),
+                    // ),
+                    // const PopupMenuItem<Menu>(
+                    //   value: Menu.itemFour,
+                    //   child: Text('Item 4'),
+                    // ),
+                  ]),
         ],
         title: Text(widget.title),
       ),
