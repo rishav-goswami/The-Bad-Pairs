@@ -42,10 +42,12 @@ class Session {
   static Future<void> setBool(String key, bool value) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool(key, value);
+    debugPrint("Set Bool Called ! ");
   }
 
   static Future<bool?> getBool(String key) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    debugPrint("Get Bool Called !");
     return prefs.getBool(key);
   }
 }

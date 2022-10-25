@@ -11,16 +11,6 @@ void main() {
   runApp(const ProviderScope(child: MyApp()));
 }
 
-// Future<void> toggleTheme() async {
-//   bool? isDark = await Session.getBool(Constants.isDarkKey);
-//   if (isDark == null) {
-//     Session.setBool(Constants.isDarkKey, isDarkTheme);
-//     return;
-//   } else {
-//     isDarkTheme = isDark;
-//   }
-// }
-
 bool isDarkTheme = true;
 
 class MyApp extends ConsumerWidget {
@@ -29,6 +19,7 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     isDarkTheme = ref.watch(isDarkThemeProvider);
+    ref.read(isDarkThemeProvider.notifier).toggleAsBefore();
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'The Bad Pairs',
