@@ -24,12 +24,43 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     _initPlayerData();
   }
 
+// Initializing Player data from shared Pref
   void _initPlayerData() async {
     playerList = Session.getStringList(Constants.playersListKey);
     var name = await playerList;
-    playerNames.addAll([...name!]);
+    debugPrint("_initPlayerData called : $name");
+    if (name != null) {
+      playerNames.clear();
+      playerNames.addAll([...name]);
+    }
   }
 
+//  adding entered player
+  _addPlayers() async {
+    final enteredText = playersNameController.text;
+    if (enteredText.isNotEmpty) {
+      var enteredNames = enteredText.split(',');
+      for (var i = 0; i < enteredNames.length; i++) {
+        if (enteredNames[i].contains(',')) {
+          enteredNames.removeAt(i);
+        }
+      }
+
+      debugPrint("entered names[] : $enteredNames");
+
+      setState(() {
+        if (enteredNames.isNotEmpty) playerNames.addAll(enteredNames);
+      });
+
+      await Session.setStringList(Constants.playersListKey, playerNames);
+      if ((await playerList) == null) {
+        _initPlayerData();
+      }
+    }
+    playersNameController.clear();
+  }
+
+// TO delete a single player on long_press on it
   void _deletePlayer(int idx) async {
     setState(() {
       playerNames.removeAt(idx);
@@ -37,6 +68,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     await Session.setStringList(Constants.playersListKey, playerNames);
   }
 
+  // Confirmation dialog box for deletion of player
   Future<void> _showMyDialog(int idx) async {
     return showDialog<void>(
       context: context,
@@ -72,6 +104,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     );
   }
 
+  // Function to toggle between light and dark theme
   void toggleTheme(WidgetRef ref) async {
     ref.read(isDarkThemeProvider.notifier).toggle();
     setState(() {});
@@ -93,14 +126,11 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
         ],
         title: Text(widget.title),
       ),
-      // backgroundColor: Colors.black,
       body: Container(
         margin: const EdgeInsets.only(top: 8, bottom: 8),
         height: MediaQuery.of(context).size.height,
         padding: const EdgeInsets.all(16.0),
         decoration: const BoxDecoration(
-            // color: Colors.black,
-            // backgroundBlendMode: BlendMode.colorBurn,
             image: DecorationImage(
                 image: AssetImage(
                   'assets/images/bg.png',
@@ -174,9 +204,9 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     );
   }
 
+//  Input area to take player names as input
   TextField _buildInputField() {
     return TextField(
-      // style: const TextStyle(color: Colors.white),
       controller: playersNameController,
       textAlign: TextAlign.justify,
       keyboardType: TextInputType.name,
@@ -184,31 +214,10 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       textCapitalization: TextCapitalization.words,
       decoration: InputDecoration(
           suffix: ElevatedButton(
-              onPressed: () async {
-                var enteredName = playersNameController.text.split(',');
-                for (var i = 0; i < enteredName.length; i++) {
-                  if (enteredName[i].contains(',')) {
-                    enteredName.removeAt(i);
-                  }
-                }
-                debugPrint("entered name >> $enteredName");
-
-                setState(() {
-                  if (enteredName.isNotEmpty) playerNames.addAll(enteredName);
-                });
-                await Session.setStringList(
-                    Constants.playersListKey, playerNames);
-
-                playersNameController.clear();
-              },
-              child: const Text('Add')),
+              onPressed: () => _addPlayers(), child: const Text('Add')),
           hintText: 'Ex:- Sourabh, Rohit, Bholu, ...',
           label: const Text("Player's Name"),
-          // hintStyle: const TextStyle(color: Colors.white),
-          // labelStyle: const TextStyle(color: Colors.white),
-          // hoverColor: Colors.white,
           border: const OutlineInputBorder(
-              // borderSide: BorderSide(color: Colors.white, width: 0.0),
               borderRadius: BorderRadius.all(Radius.circular(21.0)))),
     );
   }
@@ -234,36 +243,13 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                 Text(
                   'Team ${String.fromCharCode(65 + index)}',
                   style: const TextStyle(
-                    // color: Colors.white,
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 InkWell(
                   onLongPress: () => _showMyDialog(index * 2),
-                  child: SizedBox(
-                    height: 30,
-                    width: MediaQuery.of(context).size.width * 0.30,
-                    child: FittedBox(
-                      child: Text(
-                        names[index * 2],
-                        style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w500,
-                            shadows: [
-                              for (double i = 1; i < 4; i++)
-                                Shadow(
-                                  color: index < Constants.colors.length
-                                      ? Constants.colors[index]
-                                      : Constants.colors[
-                                          index % Constants.colors.length],
-                                  blurRadius: 5 * i,
-                                )
-                            ]),
-                      ),
-                    ),
-                  ),
+                  child: _buildNeonLightText(context, names, index, true),
                 ),
                 const SizedBox(
                   width: 10,
@@ -274,35 +260,40 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                         ? _showMyDialog(index * 2 + 1)
                         : null;
                   },
-                  child: SizedBox(
-                    height: 30,
-                    width: MediaQuery.of(context).size.width * 0.30,
-                    child: FittedBox(
-                      child: Text(
-                        index * 2 + 1 < names.length
-                            ? names[index * 2 + 1]
-                            : '--',
-                        style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w500,
-                            shadows: [
-                              for (double i = 1; i < 4; i++)
-                                Shadow(
-                                  color: index < Constants.colors.length
-                                      ? Constants.colors[index]
-                                      : Constants.colors[
-                                          index % Constants.colors.length],
-                                  blurRadius: 5 * i,
-                                )
-                            ]),
-                      ),
-                    ),
-                  ),
+                  child: _buildNeonLightText(context, names, index, false),
                 ),
               ],
             ),
           );
         }));
+  }
+
+//  To build and return colorful neon light effect text according to position
+  SizedBox _buildNeonLightText(
+      BuildContext context, List<String> names, int index, bool isFirst) {
+    return SizedBox(
+      height: 30,
+      width: MediaQuery.of(context).size.width * 0.30,
+      child: FittedBox(
+        child: Text(
+          isFirst
+              ? names[index * 2]
+              : (index * 2 + 1 < names.length ? names[index * 2 + 1] : '--'),
+          style: TextStyle(
+              fontSize: 20,
+              color: Colors.white,
+              fontWeight: FontWeight.w500,
+              shadows: [
+                for (double i = 1; i < 4; i++)
+                  Shadow(
+                    color: index < Constants.colors.length
+                        ? Constants.colors[index]
+                        : Constants.colors[index % Constants.colors.length],
+                    blurRadius: 5 * i,
+                  )
+              ]),
+        ),
+      ),
+    );
   }
 }
