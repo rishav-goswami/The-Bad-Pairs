@@ -1,11 +1,10 @@
 import 'package:animated_splash_screen/animated_splash_screen.dart';
-import 'package:badminton_team_up/config/constants.dart';
-import 'package:badminton_team_up/config/session.dart';
-import 'package:badminton_team_up/providers/theme_provider.dart';
-import 'package:badminton_team_up/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:page_transition/src/enum.dart';
+
+import 'package:badminton_team_up/providers/theme_provider.dart';
+import 'package:badminton_team_up/screens/home_screen.dart';
 
 void main() {
   runApp(const ProviderScope(child: MyApp()));

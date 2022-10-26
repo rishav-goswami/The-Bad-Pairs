@@ -1,6 +1,8 @@
 import 'package:badminton_team_up/config/constants.dart';
 import 'package:badminton_team_up/config/session.dart';
+import 'package:badminton_team_up/providers/team_provider.dart';
 import 'package:badminton_team_up/providers/theme_provider.dart';
+import 'package:badminton_team_up/screens/create_match_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -118,10 +120,41 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
 // To delete all teams of players
   void _deleteAllPlayers() async {
-    await Session.deletePrefData(Constants.playersListKey);
-    setState(() {
-      playerNames.clear();
-    });
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete All Players !'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: const <Widget>[
+                Text('Players will no longer be saved'),
+                Text('Are you sure to remove ?'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Sure'),
+              onPressed: () {
+                Session.deletePrefData(Constants.playersListKey);
+                setState(() {
+                  playerNames.clear();
+                });
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   // Confirmation dialog box for deletion of player
@@ -181,22 +214,33 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
               }),
           // This button presents popup menu items.
           PopupMenuButton<Menu>(
-              // Callback that sets the selected popup menu item.
-              onSelected: (Menu item) {
-                setState(() {
-                  _selectedMenu = item.name;
-                });
-              },
+              // // Callback that sets the selected popup menu item.
+              // onSelected: (Menu item) {
+              //   setState(() {
+              //     _selectedMenu = item.name;
+              //   });
+              // },
               itemBuilder: (BuildContext context) => <PopupMenuEntry<Menu>>[
                     PopupMenuItem<Menu>(
                       value: Menu.deleteAll,
-                      onTap: _deleteAllPlayers,
+                      onTap: () {
+                        Future.delayed(
+                            Duration.zero, () => _deleteAllPlayers());
+                      },
                       child: const Text('Delete All Teams'),
                     ),
-                    // const PopupMenuItem<Menu>(
-                    //   value: Menu.itemTwo,
-                    //   child: Text('Item 2'),
-                    // ),
+                    PopupMenuItem<Menu>(
+                        value: Menu.itemTwo,
+                        child: const Text('Create Match'),
+                        onTap: () {
+                          ref.read(teamProvider.notifier).addTeams(playerNames);
+                          Future.delayed(
+                              Duration.zero,
+                              () => Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          PossibleMatches())));
+                        }),
                     // const PopupMenuItem<Menu>(
                     //   value: Menu.itemThree,
                     //   child: Text('Item 3'),

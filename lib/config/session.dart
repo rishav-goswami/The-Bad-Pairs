@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class Session {
+abstract class Session {
   static Future<void> setStringList(String key, List<String> value) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setStringList(key, value);
