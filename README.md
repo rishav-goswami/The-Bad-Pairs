@@ -1,4 +1,5 @@
-# The Bad Pairs 🏸
+![The Bad Pairs 🏸](https://user-images.githubusercontent.com/77602579/198717710-66a59ebe-8067-4f15-b10a-c77b35dd427c.png)
+
 [![GitHub license](https://img.shields.io/github/license/Jake1924/The-Bad-Pairs?style=plastic)](https://github.com/Jake1924/The-Bad-Pairs/blob/main/LICENSE.md) [![GitHub stars](https://img.shields.io/github/stars/Jake1924/The-Bad-Pairs?style=plastic)](https://github.com/Jake1924/The-Bad-Pairs/stargazers) 
 [![GitHub issues](https://img.shields.io/github/issues/Jake1924/The-Bad-Pairs?style=plastic)](https://github.com/Jake1924/The-Bad-Pairs/issues) [![GitHub forks](https://img.shields.io/github/forks/Jake1924/The-Bad-Pairs?style=plastic)](https://github.com/Jake1924/The-Bad-Pairs/network)
 
@@ -13,6 +14,9 @@ The Bad pair apk provides fast random teamup. By using this app our team making 
 
 ## How you can use it ?
 Actually for now it is specifically designed for badminton. If your problem is same in your free game period and have limited time to play. Then you can **use it just by downloading** the latest release apk from [here](https://github.com/Jake1924/The-Bad-Pairs/releases)
+
+## Screenshots
+<img src="https://user-images.githubusercontent.com/77602579/198714154-38232b3f-637a-4031-bfda-1b59614127f4.png" width="200" height="400" />  <img src="https://user-images.githubusercontent.com/77602579/198714178-1077751d-b659-43a5-9e94-eb95d8c20713.png" width="200" height="400" /> <img src="https://user-images.githubusercontent.com/77602579/198715441-a28b39cf-2524-422b-9c8d-e18b255f495e.png" width="200" height="400" />
 
 ## Scope & Future
 The Bad Pairs is a working application and doing its job perfectly for what it is originated for. But as any game doesn't constraint with only a single problem, thus it gonna have other features too. Some of the idea I have are
