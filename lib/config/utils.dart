@@ -1,5 +1,5 @@
 class Utils {
-  static List printCombination(List arr, int n, int r) {
+  static List getCombination(List arr, int n, int r) {
     // A temporary array to store
     // all combination one by one
     var data = List.filled(r, {});
@@ -10,6 +10,7 @@ class Utils {
     return answer;
   }
 
+// To generate possible combinations of teams
   static void _combinationUtil(
       List arr, int n, int r, int index, List data, int i, List answer) {
     // Current combination is ready, print it

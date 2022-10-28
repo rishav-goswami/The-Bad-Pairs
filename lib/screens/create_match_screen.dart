@@ -37,6 +37,7 @@ class _PossibleMatchesState extends ConsumerState<PossibleMatches> {
                         Text(data[index * 2].values.first.first),
                         Text(data[index * 2].values.first.last),
                       ]),
+                      const Text('Vs'),
                       Column(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
@@ -56,7 +57,7 @@ class _PossibleMatchesState extends ConsumerState<PossibleMatches> {
 
   _possibleMatches(var listOfTeams) {
     var possibleTeams =
-        Utils.printCombination(listOfTeams, listOfTeams.length, 2);
+        Utils.getCombination(listOfTeams, listOfTeams.length, 2);
     debugPrint("Generated Matches : $possibleTeams");
     return possibleTeams;
   }

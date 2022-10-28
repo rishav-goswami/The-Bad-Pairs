@@ -64,46 +64,55 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
         _initPlayerData();
       }
     }
+    // FocusScope.of(context).unfocus();
     playersNameController.clear();
   }
 
   // To update/edit player name showing bottom model sheet
   Future<void> _showBottomSheet(int idx, BuildContext context) async {
     return showModalBottomSheet(
-        clipBehavior: Clip.none,
+        isScrollControlled: true,
         context: context,
         elevation: 8,
         builder: (context) {
           return Container(
             decoration: BoxDecoration(borderRadius: BorderRadius.circular(28)),
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: [
-                  _buildNeonLightText(context, ["The Bad Pairs !"], 0, true),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  const Text("Update Player's name !"),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  TextField(
-                    textInputAction: TextInputAction.done,
-                    onSubmitted: (val) async {
-                      playerNames.setAll(idx, [val]);
-                      await Session.setStringList(
-                          Constants.playersListKey, playerNames);
-                    },
-                    decoration: InputDecoration(
-                      border: const OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(14.0)),
-                      ),
-                      label: const Text("Edit Player name"),
-                      hintText: playerNames[idx],
+              padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildNeonLightText(context, ["The Bad Pairs !"], 0, true),
+                    const SizedBox(
+                      height: 10,
                     ),
-                  ),
-                ],
+                    const Text("Update Player's name !"),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    TextField(
+                      textInputAction: TextInputAction.done,
+                      onSubmitted: (val) async {
+                        playerNames.setAll(idx, [val]);
+                        await Session.setStringList(
+                            Constants.playersListKey, playerNames);
+                        Navigator.of(context).pop();
+                      },
+                      decoration: InputDecoration(
+                        border: const OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(14.0)),
+                        ),
+                        label: const Text("Edit Player name"),
+                        hintText: playerNames[idx],
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 0,
+                    ),
+                  ],
+                ),
               ),
             ),
           );
@@ -214,12 +223,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
               }),
           // This button presents popup menu items.
           PopupMenuButton<Menu>(
-              // // Callback that sets the selected popup menu item.
-              // onSelected: (Menu item) {
-              //   setState(() {
-              //     _selectedMenu = item.name;
-              //   });
-              // },
               itemBuilder: (BuildContext context) => <PopupMenuEntry<Menu>>[
                     PopupMenuItem<Menu>(
                       value: Menu.deleteAll,
@@ -383,7 +386,9 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                   width: 10,
                 ),
                 InkWell(
-                  onTap: () => _showBottomSheet(index * 2 + 1, context),
+                  onTap: () => index * 2 + 1 < names.length
+                      ? _showBottomSheet(index * 2 + 1, context)
+                      : null,
                   onLongPress: () {
                     index * 2 + 1 < names.length
                         ? _showMyDialog(index * 2 + 1)
