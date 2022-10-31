@@ -30,13 +30,13 @@ class TeamNotifier extends StateNotifier<List<Map<String, List<String>>>> {
     state.addAll(tempTeams);
   }
 
-  possibleMatches() {
+  List<TeamItem> possibleMatches() {
     var possibleTeams = Utils.getCombination(state, state.length, 2);
     debugPrint("Generated Matches : $possibleTeams");
-    return possibleTeams;
+    return _generateItems(possibleTeams);
   }
 
-  List<TeamItem> generateItems(var data) {
+  List<TeamItem> _generateItems(var data) {
     return List<TeamItem>.generate(
         data.length % 2 == 0 ? data.length ~/ 2 : data.length ~/ 2 + 1,
         (int index) {
