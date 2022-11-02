@@ -14,7 +14,7 @@ class PossibleMatches extends ConsumerStatefulWidget {
 
 class _PossibleMatchesState extends ConsumerState<PossibleMatches> {
   late final List<TeamItem> _possibleMatchData;
-  late final List<int> teamScores;
+  final Map<String, int> teamScores = {};
   bool flag = true;
   @override
   Widget build(BuildContext context) {
@@ -22,7 +22,9 @@ class _PossibleMatchesState extends ConsumerState<PossibleMatches> {
     // Initializing only once
     if (flag) {
       flag = false;
-      teamScores = List<int>.filled(allTeams.length, 0);
+      for (var i = 0; i < allTeams.length; i++) {
+        teamScores[allTeams[i].keys.first] = 0;
+      }
       _possibleMatchData = ref.read(teamProvider.notifier).possibleMatches();
     }
 
@@ -69,7 +71,7 @@ class _PossibleMatchesState extends ConsumerState<PossibleMatches> {
                                 ],
                               ),
                               Text(
-                                "Score ${teamScores[index]}",
+                                "Score ${teamScores[allTeams[index].keys.first]}",
                                 style: Theme.of(context).textTheme.subtitle1,
                               )
                             ],
@@ -175,9 +177,13 @@ class _PossibleMatchesState extends ConsumerState<PossibleMatches> {
                             textInputAction: TextInputAction.next,
                             keyboardType: TextInputType.number,
                             onSubmitted: ((value) {
-                              // setState(() {
-                              //   teamScores[item.id * 2] = int.parse(value);
-                              // });
+                              if (value.isNotEmpty) {
+                                setState(() {
+                                  teamScores[item.teamAlpha] =
+                                      teamScores[item.teamAlpha]! +
+                                          int.parse(value);
+                                });
+                              }
                             }),
                             decoration: InputDecoration(
                                 border: OutlineInputBorder(
@@ -193,9 +199,13 @@ class _PossibleMatchesState extends ConsumerState<PossibleMatches> {
                           width: 100,
                           child: TextField(
                             onSubmitted: ((value) {
-                              // setState(() {
-                              //   teamScores[item.id * 2] = int.parse(value);
-                              // });
+                              if (value.isNotEmpty) {
+                                setState(() {
+                                  teamScores[item.teamBeta] =
+                                      teamScores[item.teamBeta]! +
+                                          int.parse(value);
+                                });
+                              }
                             }),
                             textInputAction: TextInputAction.done,
                             keyboardType: TextInputType.number,
