@@ -1,4 +1,3 @@
-import 'package:badminton_team_up/config/utils.dart';
 import 'package:badminton_team_up/providers/team_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,7 +6,7 @@ import '../config/constants.dart';
 import '../modals/possible_match_item.dart';
 
 class PossibleMatches extends ConsumerStatefulWidget {
-  PossibleMatches({Key? key}) : super(key: key);
+  const PossibleMatches({Key? key}) : super(key: key);
 
   @override
   ConsumerState<PossibleMatches> createState() => _PossibleMatchesState();
@@ -15,21 +14,89 @@ class PossibleMatches extends ConsumerStatefulWidget {
 
 class _PossibleMatchesState extends ConsumerState<PossibleMatches> {
   late final List<TeamItem> _possibleMatchData;
+  late final List<int> teamScores;
   bool flag = true;
   @override
   Widget build(BuildContext context) {
+    final allTeams = ref.read(teamProvider);
     // Initializing only once
     if (flag) {
       flag = false;
+      teamScores = List<int>.filled(allTeams.length, 0);
       _possibleMatchData = ref.read(teamProvider.notifier).possibleMatches();
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Possible Matches")),
+      appBar: AppBar(title: const Text("Matches & Scores")),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: _buildPanel(),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  "Scoreboard",
+                  style: Theme.of(context).textTheme.headline4,
+                ),
+              ),
+              const Divider(
+                indent: 30,
+                endIndent: 30,
+                thickness: 3,
+                color: Colors.amber,
+              ),
+              ListView.separated(
+                  itemCount: allTeams.length,
+                  shrinkWrap: true,
+                  separatorBuilder: ((context, index) => const Divider(
+                        thickness: 1,
+                      )),
+                  itemBuilder: (context, index) {
+                    return Container(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Column(
+                                children: [
+                                  _buildNeonLightText(context,
+                                      allTeams[index].keys.first, index),
+                                  Text(allTeams[index].values.first.first),
+                                  Text(allTeams[index].values.first.last)
+                                ],
+                              ),
+                              Text(
+                                "Score ${teamScores[index]}",
+                                style: Theme.of(context).textTheme.subtitle1,
+                              )
+                            ],
+                          )
+                        ],
+                      ),
+                    );
+                  }),
+              const SizedBox(
+                height: 20,
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  "Possible Matches",
+                  style: Theme.of(context).textTheme.headline4,
+                ),
+              ),
+              const Divider(
+                indent: 30,
+                endIndent: 30,
+                thickness: 3,
+                color: Colors.amber,
+              ),
+              _buildPanel(),
+            ],
+          ),
         ),
       ),
     );
@@ -107,6 +174,11 @@ class _PossibleMatchesState extends ConsumerState<PossibleMatches> {
                           child: TextField(
                             textInputAction: TextInputAction.next,
                             keyboardType: TextInputType.number,
+                            onSubmitted: ((value) {
+                              // setState(() {
+                              //   teamScores[item.id * 2] = int.parse(value);
+                              // });
+                            }),
                             decoration: InputDecoration(
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(7))),
@@ -120,6 +192,11 @@ class _PossibleMatchesState extends ConsumerState<PossibleMatches> {
                         SizedBox(
                           width: 100,
                           child: TextField(
+                            onSubmitted: ((value) {
+                              // setState(() {
+                              //   teamScores[item.id * 2] = int.parse(value);
+                              // });
+                            }),
                             textInputAction: TextInputAction.done,
                             keyboardType: TextInputType.number,
                             decoration: InputDecoration(
