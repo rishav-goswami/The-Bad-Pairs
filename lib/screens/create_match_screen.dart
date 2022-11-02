@@ -66,7 +66,42 @@ class _PossibleMatchesState extends ConsumerState<PossibleMatches> {
                 thickness: 3,
                 color: Colors.amber,
               ),
+<<<<<<< HEAD
               _buildScoreboard(allTeams),
+=======
+              ListView.separated(
+                  itemCount: allTeams.length,
+                  shrinkWrap: true,
+                  separatorBuilder: ((context, index) => const Divider(
+                        thickness: 1,
+                      )),
+                  itemBuilder: (context, index) {
+                    return Container(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Column(
+                                children: [
+                                  _buildNeonLightText(context,
+                                      allTeams[index].keys.first, index),
+                                  Text(allTeams[index].values.first.first),
+                                  Text(allTeams[index].values.first.last)
+                                ],
+                              ),
+                              Text(
+                                "Score ${teamScores[allTeams[index].keys.first]}",
+                                style: Theme.of(context).textTheme.subtitle1,
+                              )
+                            ],
+                          )
+                        ],
+                      ),
+                    );
+                  }),
+>>>>>>> 5ada5b5e5e3651e3be72388d94ec6eb1af046f59
               const SizedBox(
                 height: 20,
               ),
@@ -235,6 +270,18 @@ class _PossibleMatchesState extends ConsumerState<PossibleMatches> {
                             controller: _alphaScore,
                             textInputAction: TextInputAction.next,
                             keyboardType: TextInputType.number,
+<<<<<<< HEAD
+=======
+                            onSubmitted: ((value) {
+                              if (value.isNotEmpty) {
+                                setState(() {
+                                  teamScores[item.teamAlpha] =
+                                      teamScores[item.teamAlpha]! +
+                                          int.parse(value);
+                                });
+                              }
+                            }),
+>>>>>>> 5ada5b5e5e3651e3be72388d94ec6eb1af046f59
                             decoration: InputDecoration(
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(7))),
@@ -248,7 +295,19 @@ class _PossibleMatchesState extends ConsumerState<PossibleMatches> {
                         SizedBox(
                           width: 100,
                           child: TextField(
+<<<<<<< HEAD
                             controller: _betaScore,
+=======
+                            onSubmitted: ((value) {
+                              if (value.isNotEmpty) {
+                                setState(() {
+                                  teamScores[item.teamBeta] =
+                                      teamScores[item.teamBeta]! +
+                                          int.parse(value);
+                                });
+                              }
+                            }),
+>>>>>>> 5ada5b5e5e3651e3be72388d94ec6eb1af046f59
                             textInputAction: TextInputAction.done,
                             keyboardType: TextInputType.number,
                             decoration: InputDecoration(
