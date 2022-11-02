@@ -14,15 +14,35 @@ class PossibleMatches extends ConsumerStatefulWidget {
 
 class _PossibleMatchesState extends ConsumerState<PossibleMatches> {
   late final List<TeamItem> _possibleMatchData;
-  late final List<int> teamScores;
+  final Map<String, int> teamScores = {};
   bool flag = true;
+
+  final _alphaScore = TextEditingController();
+  final _betaScore = TextEditingController();
+
+  void _onScoreSubmit(String alphaKey, String betaKey) {
+    if (_alphaScore.text.isEmpty && _betaScore.text.isEmpty) return;
+
+    final alphaScore = int.parse(_alphaScore.text);
+    final betaScore = int.parse(_betaScore.text);
+
+    teamScores[alphaKey] = teamScores[alphaKey]! + (alphaScore - betaScore);
+    teamScores[betaKey] = teamScores[betaKey]! + (betaScore - alphaScore);
+
+    _alphaScore.clear();
+    _betaScore.clear();
+  }
+
   @override
   Widget build(BuildContext context) {
     final allTeams = ref.read(teamProvider);
+
     // Initializing only once
     if (flag) {
       flag = false;
-      teamScores = List<int>.filled(allTeams.length, 0);
+      for (var i = 0; i < allTeams.length; i++) {
+        teamScores[allTeams[i].keys.first] = 0;
+      }
       _possibleMatchData = ref.read(teamProvider.notifier).possibleMatches();
     }
 
@@ -46,38 +66,7 @@ class _PossibleMatchesState extends ConsumerState<PossibleMatches> {
                 thickness: 3,
                 color: Colors.amber,
               ),
-              ListView.separated(
-                  itemCount: allTeams.length,
-                  shrinkWrap: true,
-                  separatorBuilder: ((context, index) => const Divider(
-                        thickness: 1,
-                      )),
-                  itemBuilder: (context, index) {
-                    return Container(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      child: Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              Column(
-                                children: [
-                                  _buildNeonLightText(context,
-                                      allTeams[index].keys.first, index),
-                                  Text(allTeams[index].values.first.first),
-                                  Text(allTeams[index].values.first.last)
-                                ],
-                              ),
-                              Text(
-                                "Score ${teamScores[index]}",
-                                style: Theme.of(context).textTheme.subtitle1,
-                              )
-                            ],
-                          )
-                        ],
-                      ),
-                    );
-                  }),
+              _buildScoreboard(allTeams),
               const SizedBox(
                 height: 20,
               ),
@@ -100,6 +89,41 @@ class _PossibleMatchesState extends ConsumerState<PossibleMatches> {
         ),
       ),
     );
+  }
+
+  ListView _buildScoreboard(List<Map<String, List<String>>> allTeams) {
+    return ListView.separated(
+        itemCount: allTeams.length,
+        shrinkWrap: true,
+        separatorBuilder: ((context, index) => const Divider(
+              thickness: 1,
+            )),
+        itemBuilder: (context, index) {
+          return Container(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Column(
+                      children: [
+                        _buildNeonLightText(
+                            context, allTeams[index].keys.first, index),
+                        Text(allTeams[index].values.first.first),
+                        Text(allTeams[index].values.first.last)
+                      ],
+                    ),
+                    Text(
+                      "Score ${teamScores[allTeams[index].keys.first]}",
+                      style: Theme.of(context).textTheme.subtitle1,
+                    )
+                  ],
+                )
+              ],
+            ),
+          );
+        });
   }
 
 //  To build and return colorful neon light effect text according to position
@@ -125,6 +149,42 @@ class _PossibleMatchesState extends ConsumerState<PossibleMatches> {
               ]),
         ),
       ),
+    );
+  }
+
+  // Confirmation dialog box for deletion of player
+  Future<void> _showMyDialog(String alphaKey, String betaKey) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Update Scores !'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: const <Widget>[
+                Text('Previous Scores will be updated with Current Scores'),
+                Text('Confirm To Update Scores ?'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Let me Check!'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Update'),
+              onPressed: () {
+                _onScoreSubmit(alphaKey, betaKey);
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -172,13 +232,9 @@ class _PossibleMatchesState extends ConsumerState<PossibleMatches> {
                         SizedBox(
                           width: 100,
                           child: TextField(
+                            controller: _alphaScore,
                             textInputAction: TextInputAction.next,
                             keyboardType: TextInputType.number,
-                            onSubmitted: ((value) {
-                              // setState(() {
-                              //   teamScores[item.id * 2] = int.parse(value);
-                              // });
-                            }),
                             decoration: InputDecoration(
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(7))),
@@ -192,11 +248,7 @@ class _PossibleMatchesState extends ConsumerState<PossibleMatches> {
                         SizedBox(
                           width: 100,
                           child: TextField(
-                            onSubmitted: ((value) {
-                              // setState(() {
-                              //   teamScores[item.id * 2] = int.parse(value);
-                              // });
-                            }),
+                            controller: _betaScore,
                             textInputAction: TextInputAction.done,
                             keyboardType: TextInputType.number,
                             decoration: InputDecoration(
@@ -206,6 +258,24 @@ class _PossibleMatchesState extends ConsumerState<PossibleMatches> {
                         )
                       ],
                     ),
+                    IconButton(
+                        onPressed: () {
+                          _showMyDialog(item.teamAlpha, item.teamBeta);
+                          setState(() {});
+                        },
+                        icon: Icon(
+                          Icons.check,
+                          shadows: [
+                            for (double i = 1; i < 4; i++)
+                              Shadow(
+                                color: item.id < Constants.colors.length
+                                    ? Constants.colors[item.id]
+                                    : Constants.colors[
+                                        item.id % Constants.colors.length],
+                                blurRadius: 5 * i,
+                              )
+                          ],
+                        ))
                   ]),
             ));
       }).toList(),
