@@ -26,8 +26,10 @@ class _PossibleMatchesState extends ConsumerState<PossibleMatches> {
     final alphaScore = int.parse(_alphaScore.text);
     final betaScore = int.parse(_betaScore.text);
 
-    teamScores[alphaKey] = teamScores[alphaKey]! + (alphaScore - betaScore);
-    teamScores[betaKey] = teamScores[betaKey]! + (betaScore - alphaScore);
+    setState(() {
+      teamScores[alphaKey] = teamScores[alphaKey]! + (alphaScore - betaScore);
+      teamScores[betaKey] = teamScores[betaKey]! + (betaScore - alphaScore);
+    });
 
     _alphaScore.clear();
     _betaScore.clear();
